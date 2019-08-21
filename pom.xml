@@ -68,6 +68,6 @@
 
     <modules>
         <module>olcesium4gwt-main</module>
-        <module>olcesium4gwt-showcase</module>
+        <!--<module>olcesium4gwt-showcase</module>-->
     </modules>
 </project>

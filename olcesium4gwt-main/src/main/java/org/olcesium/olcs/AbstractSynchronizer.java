@@ -18,8 +18,8 @@ package org.olcesium.olcs;
 import jsinterop.annotations.JsConstructor;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsType;
+import ol.Map;
 import org.cesiumjs.cs.scene.Scene;
-import org.openlayers.ol.Map;
 
 /**
  *

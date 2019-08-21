@@ -17,14 +17,16 @@ package org.olcesium.olcs;
 
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsType;
+import ol.Coordinate;
+import ol.Extent;
+import ol.geom.Geometry;
+import ol.layer.Base;
+import ol.layer.Layer;
+import ol.proj.Projection;
 import org.cesiumjs.cs.core.*;
+import org.cesiumjs.cs.scene.Globe;
 import org.cesiumjs.cs.scene.ImageryLayer;
 import org.cesiumjs.cs.scene.Scene;
-import org.openlayers.ol.Coordinate;
-import org.openlayers.ol.Extent;
-import org.openlayers.ol.geom.Geometry;
-import org.openlayers.ol.layer.BaseLayer;
-import org.openlayers.ol.proj.Projection;
 
 /**
  *
@@ -86,7 +88,7 @@ public class OLCesiumCore {
      * @return 
      */
     @JsMethod
-    public static native Color convertColorToCesium(org.openlayers.ol.Color olColor);
+    public static native Color convertColorToCesium(Color olColor);
     
     /**
      * Convert an OpenLayers extent to a Cesium rectangle.
@@ -203,7 +205,7 @@ public class OLCesiumCore {
      * @return 
      */
     @JsMethod
-    public static native ImageryLayer tileLayerToImageryLayer(BaseLayer olLayer, Projection viewProj);
+    public static native ImageryLayer tileLayerToImageryLayer(Base olLayer, Projection viewProj);
     
     /**
      * Synchronizes the layer rendering properties (opacity, visible) to the given Cesium ImageryLayer.
@@ -211,5 +213,5 @@ public class OLCesiumCore {
      * @param csLayer 
      */
     @JsMethod
-    public static native void updateCesiumLayerProperties(BaseLayer olLayer, ImageryLayer csLayer);
+    public static native void updateCesiumLayerProperties(Base olLayer, ImageryLayer csLayer);
 }

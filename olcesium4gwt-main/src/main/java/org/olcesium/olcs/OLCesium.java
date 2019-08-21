@@ -17,12 +17,11 @@ package org.olcesium.olcs;
 
 import com.google.gwt.dom.client.Element;
 import jsinterop.annotations.*;
+import ol.Map;
 import org.cesiumjs.cs.collections.DataSourceCollection;
 import org.cesiumjs.cs.datasources.DataSourceDisplay;
 import org.cesiumjs.cs.scene.Scene;
 import org.olcesium.olcs.options.OLCesiumOptions;
-import org.openlayers.ol.Map;
-import org.openlayers.ol.MapPanel;
 
 /**
  *
@@ -48,12 +47,12 @@ public class OLCesium {
         return new OLCesium(options);
     }
 
-    @JsOverlay
+    /*@JsOverlay
     public static OLCesium create(MapPanel mapPanel) {
         OLCesiumOptions options = new OLCesiumOptions();
         options.map = mapPanel.getMap();
         return new OLCesium(options);
-    }
+    }*/
 
     @JsProperty(namespace = JsPackage.GLOBAL, name = "olcs")
     public static native boolean isInitialized();

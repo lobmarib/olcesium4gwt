@@ -18,10 +18,9 @@ package org.olcesium.olcs;
 import jsinterop.annotations.JsConstructor;
 import jsinterop.annotations.JsMethod;
 import jsinterop.annotations.JsType;
+import ol.Coordinate;
+import ol.Map;
 import org.cesiumjs.cs.scene.Scene;
-import org.openlayers.ol.Coordinate;
-import org.openlayers.ol.Map;
-import org.openlayers.ol.View;
 
 /**
  *

@@ -2,10 +2,10 @@ package org.olcesium.olcs.options;
 
 import com.google.gwt.dom.client.Element;
 import jsinterop.annotations.*;
+import ol.Map;
 import org.cesiumjs.cs.scene.Scene;
 import org.cesiumjs.cs.scene.options.SceneOptions;
 import org.olcesium.olcs.AbstractSynchronizer;
-import org.openlayers.ol.Map;
 
 /**
  * @author Serge Silaev aka iSergio <s.serge.b@gmail.com>

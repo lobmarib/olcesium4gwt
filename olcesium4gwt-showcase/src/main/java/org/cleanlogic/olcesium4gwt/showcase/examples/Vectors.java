@@ -5,7 +5,38 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.ToggleButton;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import ol.Collection;
+import ol.Coordinate;
+import ol.Feature;
+import ol.MapOptions;
+import ol.View;
+import ol.ViewOptions;
+import ol.color.Color;
+import ol.format.GeoJson;
+import ol.geom.Circle;
+import ol.geom.Geometry;
+import ol.geom.Point;
+import ol.geom.Polygon;
+import ol.layer.LayerOptions;
+import ol.layer.Tile;
+import ol.layer.TileLayerOptions;
+import ol.layer.Vector;
+import ol.layer.VectorLayerOptions;
+import ol.source.Osm;
+import ol.source.VectorOptions;
+import ol.style.Fill;
+import ol.style.FillOptions;
+import ol.style.Stroke;
+import ol.style.StrokeOptions;
+import ol.style.Style;
+import ol.style.StyleFunction;
+import ol.style.StyleOptions;
 import org.cesiumjs.cs.collections.LabelCollection;
 import org.cesiumjs.cs.core.Cartesian3;
 import org.cesiumjs.cs.core.providers.CesiumTerrainProvider;
@@ -16,23 +47,6 @@ import org.cleanlogic.olcesium4gwt.showcase.basic.AbstractExample;
 import org.cleanlogic.olcesium4gwt.showcase.components.store.ShowcaseExampleStore;
 import org.olcesium.olcs.OLCesiumPanel;
 import org.olcesium.olcs.options.OLCesiumOptions;
-import org.openlayers.ol.*;
-import org.openlayers.ol.format.GeoJSONFormat;
-import org.openlayers.ol.geom.*;
-import org.openlayers.ol.layer.BaseLayer;
-import org.openlayers.ol.layer.ImageLayer;
-import org.openlayers.ol.layer.TileLayer;
-import org.openlayers.ol.layer.VectorLayer;
-import org.openlayers.ol.layer.options.TileLayerOptions;
-import org.openlayers.ol.layer.options.VectorLayerOptions;
-import org.openlayers.ol.options.MapOptions;
-import org.openlayers.ol.options.ViewOptions;
-import org.openlayers.ol.source.ImageVectorSource;
-import org.openlayers.ol.source.OSMSource;
-import org.openlayers.ol.source.VectorSource;
-import org.openlayers.ol.source.options.VectorSourceOptions;
-import org.openlayers.ol.style.*;
-import org.openlayers.ol.style.options.*;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -45,13 +59,13 @@ public class Vectors extends AbstractExample {
     private static Feature textFeature = new Feature(new Point(Coordinate.create(1_000_000, 3_000_000, 50_000)));
     private static Feature cervinFeature = new Feature(new Point(Coordinate.create(852_541, 5_776_649)));
     static {
-        cervinFeature.getGeometry().set("altitudeMode", "clampToGround");
+        cervinFeature.set("altitudeMode", "clampToGround");
     }
     java.util.Map<String, Style> styles = createStyles();
 
-    private VectorLayer vectorLayer;
-    private ImageLayer  vectorLayer2;
-    private VectorSource vectorSource2;
+    private Vector vectorLayer;
+    private ol.layer.Image  vectorLayer2;
+    private ol.source.Vector vectorSource2;
 
     private Style oldStyle;
 
@@ -72,15 +86,26 @@ public class Vectors extends AbstractExample {
         cervinFeature.setStyle(iconStyle);
 
         StyleOptions styleOptions = new StyleOptions();
-        styleOptions.stroke = StrokeStyle.create("blue", 2);
-        styleOptions.fill = FillStyle.craete("green");
+        StrokeOptions strokeOptions = new StrokeOptions();
+        strokeOptions.setColor(Color.getColorFromString("blue"));
+        strokeOptions.setWidth(2);
+        styleOptions.setStroke(new Stroke(strokeOptions));
+        FillOptions fillOptions = new FillOptions();
+        fillOptions.setColor(Color.getColorFromString("green"));
+        styleOptions.setFill(new Fill(fillOptions));
         oldStyle = new Style(styleOptions);
 
         final Feature theCircle = new Feature(new Circle(Coordinate.create(5e6, 7e6, 5e5), 1e6));
 
         styleOptions = new StyleOptions();
-        styleOptions.fill = FillStyle.craete(Color.create(255, 69, 0, 0.7));
-        styleOptions.stroke = StrokeStyle.create(Color.create(255, 69, 0, 0.9), 1);
+        StrokeOptions circleStrokeOptions = new StrokeOptions();
+        circleStrokeOptions.setColor(new Color(255, 69, 0, 0.9));
+        circleStrokeOptions.setWidth(1);
+        FillOptions circleFillOptions = new FillOptions();
+        circleFillOptions.setColor(new Color(255, 69, 0, 0.7));
+
+        styleOptions.setFill(new Fill(circleFillOptions));
+        styleOptions.setStroke(new Stroke(circleStrokeOptions));
         Style cartographicRectangleStyle = new Style(styleOptions);
 
         Polygon cartographicRectangleGeometry = new Polygon(new Coordinate[][]
@@ -91,47 +116,55 @@ public class Vectors extends AbstractExample {
                         Coordinate.create(-5e6, 10.5e6),
                         Coordinate.create(-5e6, 11e6)
                 }});
-        cartographicRectangleGeometry.set("olcs.polygon_kind", "rectangle");
+//        cartographicRectangleGeometry.set("olcs.polygon_kind", "rectangle");
         Feature cartographicRectangle = new Feature(cartographicRectangleGeometry);
         cartographicRectangle.setStyle(cartographicRectangleStyle);
 
-        MultiPolygon cartographicRectangleGeometry2 = new MultiPolygon(new Coordinate[][][]
-                {
-                        {{
-                                Coordinate.create(-5e6, 12e6, 0),
-                                Coordinate.create(4e6, 12e6, 0),
-                                Coordinate.create(4e6, 11.5e6, 0),
-                                Coordinate.create(-5e6, 11.5e6, 0),
-                                Coordinate.create(-5e6, 12e6, 0)
-                        }}, {{
-                        Coordinate.create(-5e6, 11.5e6, 1e6),
-                        Coordinate.create(4e6, 11.5e6, 1e6),
-                        Coordinate.create(4e6, 11e6, 1e6),
-                        Coordinate.create(-5e6, 11e6, 1e6),
-                        Coordinate.create(-5e6, 11.5e6, 1e6)
-                        }}
-                });
-        cartographicRectangleGeometry2.set("olcs.polygon_kind", "rectangle");
-        Feature cartographicRectangle2 = new Feature(cartographicRectangleGeometry2);
-        cartographicRectangle2.setStyle(cartographicRectangleStyle);
+//        MultiPolygon cartographicRectangleGeometry2 = new MultiPolygon(new Coordinate[][][]
+//                {
+//                        {{
+//                                Coordinate.create(-5e6, 12e6, 0),
+//                                Coordinate.create(4e6, 12e6, 0),
+//                                Coordinate.create(4e6, 11.5e6, 0),
+//                                Coordinate.create(-5e6, 11.5e6, 0),
+//                                Coordinate.create(-5e6, 12e6, 0)
+//                        }}, {{
+//                        Coordinate.create(-5e6, 11.5e6, 1e6),
+//                        Coordinate.create(4e6, 11.5e6, 1e6),
+//                        Coordinate.create(4e6, 11e6, 1e6),
+//                        Coordinate.create(-5e6, 11e6, 1e6),
+//                        Coordinate.create(-5e6, 11.5e6, 1e6)
+//                        }}
+//                });
+//        cartographicRectangleGeometry2.set("olcs.polygon_kind", "rectangle");
+//        Feature cartographicRectangle2 = new Feature(cartographicRectangleGeometry2);
+//        cartographicRectangle2.setStyle(cartographicRectangleStyle);
 
         TileLayerOptions tileLayerOptions = new TileLayerOptions();
-        tileLayerOptions.source = new OSMSource();
-        TileLayer tileLayer = new TileLayer(tileLayerOptions);
+        tileLayerOptions.setSource(new Osm());
+        Tile tileLayer = new Tile(tileLayerOptions);
 
-        VectorSourceOptions vectorSourceOptions = new VectorSourceOptions();
-        vectorSourceOptions.format = new GeoJSONFormat();
-        vectorSourceOptions.url = GWT.getModuleBaseURL() + "data/geojson/vector_data.geojson";
+        VectorOptions vectorSourceOptions = new VectorOptions();
+        vectorSourceOptions.setFormat(new GeoJson());
+        vectorSourceOptions.setUrl(GWT.getModuleBaseURL() + "data/geojson/vector_data.geojson");
         VectorLayerOptions vectorLayerOptions = new VectorLayerOptions();
-        vectorLayerOptions.source = new VectorSource(vectorSourceOptions);
-        vectorLayerOptions.styleFunction = new MStyleFunction();
-        vectorLayer = new VectorLayer(vectorLayerOptions);
+        vectorLayerOptions.setSource(new ol.source.Vector(vectorSourceOptions));
+        vectorLayerOptions.setStyle(new MStyleFunction());
+        vectorLayer = new Vector(vectorLayerOptions);
 
-        VectorSourceOptions vectorSourceOptions2 = new VectorSourceOptions();
-        vectorSourceOptions2.features = new Collection<>(new Feature[] {iconFeature, textFeature, cervinFeature, cartographicRectangle, cartographicRectangle2});
-        vectorSource2 = new VectorSource(vectorSourceOptions2);
-        ImageVectorSource imageVectorSource = ImageVectorSource.create(vectorSource2);
-        vectorLayer2 = ImageLayer.create(imageVectorSource);
+        VectorOptions vectorSourceOptions2 = new VectorOptions();
+//        vectorSourceOptions2.features = new Collection<>(new Feature[] {iconFeature, textFeature, cervinFeature, cartographicRectangle, cartographicRectangle2});
+        Collection<Feature> collection = new Collection<>();
+        collection.push(iconFeature);
+        collection.push(textFeature);
+        collection.push(cervinFeature);
+        collection.push(cartographicRectangle);
+        vectorSourceOptions2.setFeatures(collection);
+        vectorSource2 = new ol.source.Vector(vectorSourceOptions2);
+        ol.source.Image imageVectorSource = new ol.source.Image();
+        LayerOptions vectorLayer2Options = new LayerOptions();
+        vectorLayer2Options.setSource(imageVectorSource);
+        vectorLayer2 = new ol.layer.Image(vectorLayer2Options);
 
         ViewOptions viewOptions = new ViewOptions();
         viewOptions.center = Coordinate.create(0, 0);
@@ -396,8 +429,9 @@ public class Vectors extends AbstractExample {
     }
 
     private final class MStyleFunction implements StyleFunction {
+
         @Override
-        public Style[] function(Feature feature, double resolution) {
+        public Style[] createStyle(Feature feature, double v) {
             Geometry geometry = feature.getGeometry();
             return new Style[] {(geometry != null) ? styles.get(geometry.getType()) : styles.get("Point")};
         }
