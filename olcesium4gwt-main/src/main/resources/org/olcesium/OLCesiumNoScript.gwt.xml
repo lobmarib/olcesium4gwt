@@ -15,4 +15,5 @@
     <set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 
     <source path="olcs"/>
+    <source path="olcsx"/>
 </module>

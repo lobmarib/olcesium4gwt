@@ -113,7 +113,7 @@ public class FeatureConverter {
      * @api
      */
     @JsMethod
-    public native Primitive olMultiGeometryToCesium(Layer layer, Feature feature, Point point, Projection projection, Style style, BillboardCollection billboards, Cesium.Function callback);
+    public native Primitive olMultiGeometryToCesium(Layer layer, Feature feature, Geometry geometry, Projection projection, Style style, BillboardCollection billboards, Cesium.Function callback);
 
     /**
      * Convert an OpenLayers text style to Cesium.
